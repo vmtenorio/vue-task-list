@@ -30,17 +30,12 @@ Vue.component("task-list", {
             this.tasks.push({ id: this.tasks.length + 1, desc: "", priority: "Medium", done: false })
         },
         sendData () {
-            // You could send your data via an API
+            // You could send your data via API
             //axios.post(TASK_API_URL, this.tasks)
             //    .then(function (response) {console.log(response);})
             var submittedList = document.getElementById("taskSubmitted");
-            if (submittedList !== null) {
-                submittedList.remove();
-            }
-            var responseContainer = document.getElementById("response");
-            var taskListEl = document.createElement("ul");
-            taskListEl.id = "taskSubmitted";
-            responseContainer.appendChild(taskListEl);
+            submittedList.innerHTML = '';
+
             var newItem, itemStr;
             this.tasks.forEach(function (t) {
                 newItem = document.createElement("li");
@@ -49,7 +44,7 @@ Vue.component("task-list", {
                 itemStr += " - Priority " + t.priority;
                 itemStr += " - Done? " + t.done.toString();
                 newItem.textContent = itemStr;
-                taskListEl.appendChild(newItem);
+                submittedList.appendChild(newItem);
             });
         }
     },
