@@ -3,7 +3,6 @@ var taskTemplate = `
     <input
       type="text"
       placeholder="Insert your task"
-      :value="desc"
       @input="$emit('update:desc', $event.target.value)"
       class="form-control"
     />
@@ -20,7 +19,6 @@ var taskTemplate = `
     <p><span>Done?</span>
     <input
       type="checkbox"
-      :checked="done"
       @change="$emit('change:done', $event.target.checked)"
       class="form-check-input"
     />
