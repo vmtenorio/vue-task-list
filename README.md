@@ -194,3 +194,4 @@ Vue.js is a powerful library that allows you to easily respond to user input in 
 
 Thank you for reading! Hope this post was useful for you. If you have any comments or suggestions, or you just want to let me know something, feel free to do so in the comments section of the post.
 
+[![ko-fi](https://cdn.ko-fi.com/cdn/kofi3.png?v=3)](https://ko-fi.com/P5P76K2OY)
