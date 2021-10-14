@@ -2,11 +2,11 @@
 
 Find out about Vue.js' components and how to exchange information between them.
 
-Vue.js is an open-source framework that can be used to build single-page applications and user interfaces. One of its main features is the creation of **components** that can be updated by the user and dynamically modify the page as preferred.
+Vue.js is an open-source framework that can be used to build single-page applications and user interfaces. One of its main features is the creation of **components** that can be updated by the user and that allow a real-time update of the webpage according to the information introduced.
 
-Today, I'm going to show you how I created a dynamic task list using Vue using two different components: a parent component representing the task list itself and all its information, and a child component representing a single task. I will also cover the communication between these two components to respond to user events.
+Today, I'm going to show you how I created a dynamic task list using Vue with two different components: a parent component representing the task list itself and all its information, and a child component representing a single task. I will also cover the communication between these two components to respond to user events.
 
-Even though you don't need any previous Vue knowledge to follow the article, it is not intended to be an introduction to Vue as a framework, because some of its core features will not be visited here.
+Even though you don't need any previous Vue knowledge to follow the article (it is self-contained), it is not intended to be an introduction to Vue as a framework, because some of its core features will not be visited here.
 
 First of all, let's take a look at the webpage we are trying to build. It can be visited [here](https://vmtenorio.github.io/vue-task-list):
 
@@ -14,21 +14,18 @@ First of all, let's take a look at the webpage we are trying to build. It can be
 
 It is a simple webpage that contains a task list, each of them having a description, a priority and a checkbox to mark whether it is already done or not. It also contains a button to add new tasks and a button to submit the information, that just prints it out below.
 
-<!--
-You only need some basic knowledge of Javascript and I'll use some bootstrap classes to give it a fine look-and-feel, but they are not important for the construction of the Vue list.
--->
-
-
 ## Setting up the basics: Vue components
 
 Components are Vue's reusable instances that form the data structure of the webpage. You can create a component specifying its properties, some data, methods or an HTML template. After it is created, you can use its name as an HTML tag anywhere on your page.
 
 ### The parent component: task-list
 
-For example, let's define a simple component to represent our task list:
+For example, let's define a simple component to represent our task list first. Although the code is commented for readibility, the details regarding Vue are explained in the paragraphs below:
 
 ```javascript
 Vue.component("task-list", {
+    // This is the data function, that will return the information we want to
+    // store in the component, in this case, the task list
     data () {
         return {
             tasks: [
@@ -37,8 +34,12 @@ Vue.component("task-list", {
             ]
         }
     },
+    // Here, we will create the methods that can be called when a certain event
+    // occurs, for example, a button is clicked
     methods: {
         newTask() {
+            // A method to insert a new task into our task list, represented in
+            // the attribute tasks from the data function
             this.tasks.push({
                 id: this.tasks.length + 1,
                 desc: "",
@@ -47,19 +48,32 @@ Vue.component("task-list", {
             })
         },
         sendData () {
-            // You could send your data via API
+            // A method that will define the behaviour of the "Submit" button.
+            // For example, you could send your data via API:
             // axios.post(TASK_API_URL, this.tasks)
             //     .then(function (response) {console.log(response);})
+
+            // In our case, we will just send the task list to be shown inside
+            // the "You submitted" section. It iterates over the task list and
+            // creates a "li" with a line for each task
+
+            // Get the container of the "You submitted" section
             var submittedList = document.getElementById("taskSubmitted");
+
+            // Remove the element to delete previously submitted tasks
             if (submittedList !== null) {
                 submittedList.remove();
             }
+
+            // Get the container where to put the submitted data and insert the
+            // tasks inside an "ul" element
             var responseContainer = document.getElementById("response");
             var taskListEl = document.createElement("ul");
             taskListEl.id = "taskSubmitted";
             responseContainer.appendChild(taskListEl);
             var newItem, itemStr;
             this.tasks.forEach(function (t) {
+                // For each task, we transform it into a string and append it
                 newItem = document.createElement("li");
                 itemStr = "";
                 itemStr += t.desc;
@@ -70,11 +84,13 @@ Vue.component("task-list", {
             });
         }
     },
-    template: listTemplate
+    // This template will contain the HTML to be placed wherever a "task-list"
+    // element is created in our webpage
+    template: listTemplate // This is a variable whose contents are detailed next
 });
 ```
 
-Here, I'm creating a global component (can be used anywhere) called task-item, that contains some data (as a function, this is important), the methods to manipulate it and a template. The `data` function returns two placeholder tasks inside an array, and the `methods` are used to add new tasks (when clicking the "Add a new task" button on the page) and to submit the information introduced in the interface (in this case, it prints the submitted data inside the "You submitted" section of the webpage, but it could also send the data via API using a library like Axios, as it can be seen in the comments).
+Here, I'm creating a global component (can be used anywhere) called `task-item`, that contains some data (as a function, this is important), the methods to manipulate it and a template. The `data` function returns two placeholder tasks inside an array, and the `methods` are used to add new tasks (when clicking the "Add a new task" button on the page) and to submit the information introduced in the interface (in this case, it prints the submitted data inside the "You submitted" section of the webpage, but it could also send the data via API using a library like Axios, as it can be seen in the comments).
 
 Now that I have defined this component, I can use the `task-list` HTML tag anywhere in the document. Vue would then substitute this element by the contents of the `template` attribute, in this case, the `listTemplate` variable, that contains:
 
@@ -98,11 +114,12 @@ var listTemplate = `
 `;
 ```
 
-We can see here the structure of the task list we saw earlier in the image of the webpage, as a Bootstrap list-group element (if you don't know Bootstrap, you just need to know that this element is used to easily define a pretty list of elements).
+We can see here the structure of the task list we saw earlier in the image of the webpage, as a Bootstrap list-group class (if you don't know Bootstrap, you just need to know that this class is used to easily define a pretty list of elements).
 
-Let's focus first on the "Add a new task" and "Submit" buttons. Notice the `@click` HTML attribute? It is a short form of `v-on:click`, which defines the behaviour when a certain event occurs, in this case, the `click` event. When clicked, they launch the methods defined earlier in the component.
+Let's focus first on the "Add a new task" and "Submit" buttons. Notice the `@click` HTML attribute? It is a short form of `v-on:click`, that defines the behaviour when a certain event occurs, in this case, the `click` event. When clicked, they launch the methods defined earlier in the component.
 
-We can also see an unknown HTML tag: `task-item`. It loops over the task list (contained in the `tasks` array, defined in the `data` function) with the `v-for` directive. It also contains several handlers for some events, that just update the value of the property of each task to the content of some variable `event`. As you may have already guessed, this `task-item` is another component, a child component.
+We can also see an unknown HTML tag: `task-item`. It loops over the task list (contained in the `tasks` array, defined in the `data` function) with the `v-for` directive. This directive creates a different task-item for each element in the tasks array, and it also has the advantage of being dynamically updated. Also inside this task-item, there are several handlers for some events (preceded by '@'), that just update the value of the property of each task to the content of some variable `event`. As you may have already guessed, this `task-item` is another Vue component, a child component.
+
 
 ### The child component: task-item
 
@@ -110,17 +127,20 @@ The `task-item` component represents a single task in our task list. We can decl
 
 ```javascript
 Vue.component("task-item", {
+    // In this case, we declare the properties of each task
     props: {
         id: Number,
         desc: String,
         priority: String,
         done: Boolean
     },
+    // It also contains a template with the HTML to place instead of the
+    // task-item element
     template: taskTemplate
 });
 ```
 
-In this case, the component is simpler, it just contains the template and the properties of the component: an identifier, the description of the task, its priority and whether it is already done or not.
+In this case, the component is simpler, it just contains the template and the properties of the component: an identifier, the description of the task, its priority and whether it is already done or not. These properties are not necessary, it works without declaring them as well, but improves the readibility of the code.
 
 Let's now analyze the contents of the template for the task item:
 
@@ -158,13 +178,13 @@ It contains the input of type text to introduce the description of the task, the
 
 ## Communication between parent and child components
 
-Vue needs a way to bind a certain HTML element where the user can introduce data (such as an `input` or a `select` as we have used) to a certain property of our components. The most common way to do so is to use the `v-bind:attribute="prop"` directive (or its short form `:attribute="prop"`), which binds the value of the `attribute` of the HTML element where it is placed to the property defined in the data of the component.
+Vue needs a way to bind a certain HTML element where the user can introduce data (such as an `input` or a `select` as we have used) to a certain property of our components. The most common way to do so is to use the `v-bind:attribute="prop"` directive (or its short form `:attribute="prop"`, which binds the value of the `attribute` of the HTML element where it is placed to the property defined in the data of the component.
 
-For example, if we wanted to bind the `value` property of the first `input` HTML element to the `desc` property of our task-item, we just have to place `:value="desc"` in the `input` element. However, this updates the data of the object representing the component itself (i.e. the data attribute in the `task-item` component), and it would not change the contents of the data in the parent. This would be useful if we had declared the data inside the `task-item` component, but as we have done so in the parent, we must use the `emit` function to send the data upwards.
+For example, if we wanted to bind the `value` property of the first `input` HTML element to the `desc` property of our task-item, we just have to place `:value="desc"` in the `input` element. We have not done it this way, because this updates the data of the object representing the component itself (i.e. the data attribute in the `task-item` component, something we have not declared, so it won't make any effect in our task list), and it would not change the contents of the data in the parent. This would be useful if we had declared the data inside the `task-item` component, but as we have done so in the parent (useful for data handling like submitting it), we must use the `emit` function to send the data upwards.
 
 The `emit` function is used to trigger a custom event to the parent component, optionally with an argument. It receives two arguments: a name of the event to trigger and, optionally, any value. In this case, the first input element (the one of type text, controlling the description of the task) is emitting a `change:desc` event with the optional argument set to the text introduced by the user (`$event.target` refers to the input element itself, and the `value` of this element is the text it contains).
 
-If you remember from earlier in the article, this event was captured in the task list (inside the task list template) and it set the optional value received as argument (inside the `$event` variable) to the `desc` property of the item.
+If you remember from the task list HTML template, this event was captured and it set the optional value received as argument (inside the `$event` variable) to the `desc` property of the item. This allows to update the data inside the task list, where we have declared it.
 
 This parent-child communication allows you to declare and manipulate the data in the parent component, making it much easier to, for example, add new tasks to the page (simply pushing to an array) or sending the data via API.
 
@@ -172,16 +192,5 @@ This parent-child communication allows you to declare and manipulate the data in
 
 Vue.js is a powerful library that allows you to easily respond to user input in real-time. In this article, we have covered here the specifics of the communication between a hierarchy of components. This allows us to store the data in the most convenient way to manipulate it. But this is just one of Vue's features. If you want to find out more, refer to [the documentation](https://vuejs.org/v2/guide/) or some of the tutorials available online (I found useful the free introduction course in [vueschool.io](https://vueschool.io/courses/vuejs-3-fundamentals)).
 
-Hope this post was useful for you. If you have any comments or suggestions, or you just want to let me know something, feel free to do so in the comments section of the post.
-
-
-
-
-
-
-
-
-
-
-
+Thank you for reading! Hope this post was useful for you. If you have any comments or suggestions, or you just want to let me know something, feel free to do so in the comments section of the post.
 
