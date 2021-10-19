@@ -60,7 +60,10 @@ Vue.component("task-list", {
             // Get the container of the "You submitted" section
             var submittedList = document.getElementById("taskSubmitted");
 
-            // Remove the element to delete previously submitted tasks
+            // To prevent the duplication of the tasks inside the "You
+            // submitted" section when the user has clicked the submitted
+            // button more than once, we delete its contents if the container
+            // is found
             if (submittedList !== null) {
                 submittedList.remove();
             }
@@ -116,7 +119,7 @@ var listTemplate = `
 
 We can see here the structure of the task list we saw earlier in the image of the webpage, as a Bootstrap list-group class (if you don't know Bootstrap, you just need to know that this class is used to easily define a pretty list of elements).
 
-Let's focus first on the "Add a new task" and "Submit" buttons. Notice the `@click` HTML attribute? It is a short form of `v-on:click`, that defines the behaviour when a certain event occurs, in this case, the `click` event. When clicked, they launch the methods defined earlier in the component.
+Let's focus first on the "Add a new task" and "Submit" buttons. Dic you notice the `@click` HTML attribute? It is a short form of `v-on:click`, that defines the behaviour when a certain event occurs, in this case, the `click` event. When clicked, they launch the methods defined earlier in the component.
 
 We can also see an unknown HTML tag: `task-item`. It loops over the task list (contained in the `tasks` array, defined in the `data` function) with the `v-for` directive. This directive creates a different task-item for each element in the tasks array, and it also has the advantage of being dynamically updated. Also inside this task-item, there are several handlers for some events (preceded by '@'), that just update the value of the property of each task to the content of some variable `event`. As you may have already guessed, this `task-item` is another Vue component, a child component.
 
